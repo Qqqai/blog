@@ -1,0 +1,10 @@
+server:
+  port: 20000
+spring:
+  application:
+    name: blog
+  datasource:
+    url: jdbc:mysql://127.0.0.1/blog
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.jdbc.Driver
