@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="qqai.blog.mapper.BkCommentsMapper">
+
+
+    <select id="getCommentInfoByArticlesId" resultType="qqai.blog.vo.CommentInfoVo">
+        SELECT
+            bf.user_name,
+            bf.user_email,
+            bc.user_id,
+            bc.comment_id,
+            bc.comment_date,
+            bc.comment_content
+        FROM
+            `bk_comments` bc
+        LEFT JOIN `bk_user_friends` bf ON bc.user_id = bf.id
+        WHERE
+            bc.article_id = #{articlesId}
+    </select>
+</mapper>
