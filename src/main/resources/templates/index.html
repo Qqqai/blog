@@ -1,0 +1,585 @@
+﻿<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+    <title th:text="${session.me.userHtmlTitle}"></title>
+    <meta name="description" th:content="${session.me.userDescription}">
+    <meta name="keywords" th:content="${session.me.userKeywords}">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="shortcut icon" th:href="@{/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.css">
+    <link rel="stylesheet" type="text/css" href="https://www.huangwx.cn/css/sweetalert.css">
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <!--    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">-->
+
+    <style>
+        .mask {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            display: none;
+        }
+
+        .modal {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            margin: -150px 0 0 -180px;
+            width: 400px;
+            /*
+                        !*使用translate将元素往后退自己大小的一半 这里的‘50%’是该元素大小的一半*!
+                        -webkit-transform: translate(-50%, -50%);
+                        -moz-transform: translate(-50%, -50%);
+                        transform: translate(-50%, -50%);*/
+            border-radius: 5px;
+            background: #fff;
+            box-shadow: 2px 3px 20px rgba(0, 0, 0, 0.2);
+            z-index: 120;
+            display: none;
+        }
+
+        .modal .modal-header {
+            height: 50px;
+            border-bottom: 1px solid #f5f5f5;
+            padding: 0 15px;
+        }
+
+        .modal .modal-header p {
+            line-height: 50px;
+            display: inline-block;
+        }
+
+        .modal .modal-header .title {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .modal .modal-header .close {
+            float: right;
+            font-size: 26px;
+            margin-top: -2px;
+            color: #9C9FA4;
+            cursor: default;
+        }
+
+        .modal .modal-content {
+            min-height: 100px;
+        }
+
+        .modal .modal-footer .btn {
+            padding: 0 20px;
+            height: 36px;
+            line-height: 36px;
+            color: white;
+            background: #409EFF;
+            border: none;
+        }
+
+        .modal .modal-footer {
+            border-top: 1px solid #f5f5f5;
+            padding: 15px;
+            text-align: right;
+
+        }
+
+        .container::after {
+            content: "";
+            display: block;
+            clear: both;
+        }
+
+        .modal-content div input {
+            margin-top: 10px;
+            padding: 0 10px;
+            width: 320px;
+            height: 34px;
+            border: 1px solid rgba(255, 255, 255, .8);
+            border-radius: 2px;
+            color: #fff;
+            background: rgba(0, 0, 0, .15);
+        }
+    </style>
+
+    <script type="text/javascript">
+        if (!!window.ActiveXObject || "ActiveXObject" in window) { //is IE?
+            alert('朋友，上古浏览器不支持呢~');
+        }
+    </script>
+</head>
+<body>
+<div id="body-wrap">
+    <nav class="not_index_bg" id="nav" style="background-image:url(https://api.ixiaowai.cn/api/api.php)">
+        <div id="page_site-info">
+            <div id="site-title">
+                <span class="blogtitle"></span>
+                <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
+                <script>
+                    var typed = new Typed(".blogtitle", {
+                        strings: ['求知若饥，虚心若愚', 'Stay Hungry Stay Foolish'],
+                        startDelay: 300,
+                        typeSpeed: 100,
+                        loop: true,
+                        backSpeed: 50,
+                        showCursor: true
+                    });
+                </script>
+            </div>
+        </div>
+    </nav>
+    <main id="content-outer">
+        <div class="layout_page" id="content-inner">
+            <div class="aside_content" id="aside_content">
+                <div class="card-widget card-info">
+                    <div class="card-content">
+                        <div class="card-info-avatar is-center">
+                            <img class="avatar-img" th:src="${session.me.userProfilePhoto}" alt="avatar">
+                            <div class="author-info__name">[[${session.me.userNickname}]]</div>
+                            <div class="author-info__description">[[${session.me.userDescription}]]</div>
+                        </div>
+                        <div class="card-info-social-icons is-center">
+                            <a title="进入github主页" class="social-icon" th:href="${session.me.userGithubAddress}"
+                               target="_blank">
+                                <i class="fa fa-github"></i>
+                            </a>
+                            <a title="发送邮件" class="social-icon" th:href="'mailto:'+${session.me.userEmail}"
+                               target="_blank">
+                                <i class="fa fa-envelope" aria-hidden="true"></i>
+                            </a>
+                            <a title="下载简历" th:if="${session.ok != null}" class="social-icon" href="/down/resume/excel"
+                               target="_blank">
+                                <i class="fa fa-newspaper-o" aria-hidden="true"></i>
+                            </a>
+
+                            <a title="下载简历" id="authA" th:if="${session.ok == null}" class="social-icon">
+                                <i class="fa fa-newspaper-o" aria-hidden="true"></i>
+                            </a>
+                            <!--                    标记  -->
+                            <div id="modal3" class="modal">
+                                <div class="modal-header">
+                                    <p id="title3" class="title">栈主认证</p>
+                                    <p id="close3" class="close">×</p>
+                                </div>
+                                <form method="post" action="/auth">
+                                    <div class="modal-content" style="text-align: center; height: 60px">
+                                        <div style="margin-top: 30px">
+                                            <input type="password" name="authword" placeholder="请输入认证密码...">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="close btn">确定</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div id="mask3" class="mask"></div>
+                            <!--
+
+                                                        <div>
+                                                            <h6 th:if="${session.ok == null}">
+                                                                <input type="button" id="authButton" style="width: 280px" value="栈主认证">
+                                                                <form action="" method="post">
+                                                                    <input id="passwordInput" type="hidden" style="width: 228px" name="authword"
+                                                                           placeholder="请输入认证密码...">
+                                                                    <input id="btnInput" type="hidden">
+                                                                </form>
+                                                            </h6>
+                                                        </div>
+                            -->
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-widget card-announcement">
+                    <div class="card-content">
+                        <div class="item-headline">
+                            <i class="fa fa-bullhorn" aria-hidden="true"></i>
+                            <span>一言</span>
+                        </div>
+                        <div id="hitokoto"></div>
+                    </div>
+                </div>
+                <div class="card-widget card-announcement">
+                    <div class="card-content">
+                        <div class="item-headline">
+                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                            <span>今日诗词</span>
+                        </div>
+                        <div id="jinrishici-sentence"></div>
+                    </div>
+                </div>
+
+                <div class="card-widget card-webinfo">
+                    <div class="card-content">
+                        <div class="item-headline">
+                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                            <span>站点信息</span>
+                        </div>
+                        <div class="webinfo">
+                            <div class="webinfo-item">
+                                <div class="webinfo-site-uv-name">本站访客数 :</div>
+                                <div class="webinfo-site-uv-count" id="busuanzi_value_site_uv"></div>
+                            </div>
+                            <div class="webinfo-item">
+                                <div class="webinfo-site-name">本站总访问量 :</div>
+                                <div class="webinfo-site-pv-count" id="busuanzi_value_site_pv"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <article id="page">
+                <div class="article-container">
+                    <meting-js
+                            server="netease"
+                            type="playlist"
+                            id="689054247"
+                            mutex="true"
+                            autoplay="false"
+                            fixed="true">
+                    </meting-js>
+                    <hr>
+
+                    <div>
+                        <h2 style="display: inline">技能属性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+                        <h2 th:if="${session.ok != null}" style="display: inline"><a
+                                style="margin-left: 20px; color: #01a0e4" id="open">添加新技能
+                            <i class="fa fa-plus" aria-hidden="true"></i></a>
+                        </h2>
+                    </div>
+                    <div class="skillbox">
+                        <div class="skillbar" th:each="sub : ${session.me.relations}">
+                            <div class="skillbar-title"
+                                 th:style="'background: linear-gradient(to right, #FFEB3B 0%, #FFF176 100%); width: ' + ${sub.subjectSchedule} + '%'">
+                                <span th:text="${sub.subjectName}"></span>
+                            </div>
+                            <div class="skill-bar-percent">[[${sub.subjectSchedule}]]%</div>
+                            <!--  <a th:href="'/blog/bk-articles/' + ${sub.subjectId} + '/articles'"
+                                 style="float: right; margin-right: -80px"
+                                 target="_blank">笔记总结→</a>-->
+                        </div>
+                    </div>
+
+                    <!--                    标记  -->
+                    <div id="modal4" class="modal">
+                        <div class="modal-header">
+                            <p id="title4" class="title">添加新技能</p>
+                            <p id="close4" class="close">×</p>
+                        </div>
+                        <form method="post" action="/blog/bk-user-subject-relation/add/subject">
+                            <div class="modal-content" style="text-align: center">
+                                <p>如果想修改直接输入名称和修改之后的的进度即可</p>
+                                <p>(名称不可修改！)</p>
+                                <div><input type="text" name="subName" placeholder="请输入添加的技能名称..."></div>
+                                <div><input type="text" name="schedule" placeholder="请输入技能学习进度..."></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="close btn">确定</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="mask4" class="mask"></div>
+
+
+                    <hr>
+                    <h2 style="display: inline">记录点滴&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+                    <h2 th:if="${session.ok != null}" style="display: inline">
+                        <a href="/blog/input" target="_blank" style="margin-left: 20px; color: #01a0e4">添加新文章
+                            <i class="fa fa-plus" aria-hidden="true"></i></a>
+                    </h2>
+                    <div class="tool">
+                        <div style="max-width: 300px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap"
+                             th:each="v : ${vo.vos}">
+                            <a th:href="'/blog/bk-articles/' +  ${v.articleId} + '/' + articles" target="_blank"
+                               th:text="${v.articleTitle}">
+                            </a>
+                        </div>
+                    </div>
+
+
+                    <hr>
+                    <h2 style="display: inline">读万卷书&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+                    <h2 th:if="${session.ok != null}" style="display: inline">
+                        <a id="open1" style="margin-left: 20px; color: #01a0e4">添加新的练习网站
+                            <i class="fa fa-plus" aria-hidden="true"></i></a>
+                    </h2>
+                    <div class="tool">
+                        <span th:each="link : ${vo.type0Links}">
+                            <a th:href="${link}" target="_blank"
+                               th:text="${link.bkLinkTitle}"></a><br></span>
+                    </div>
+
+                    <!--                    标记  -->
+                    <div id="modal1" class="modal">
+                        <div class="modal-header">
+                            <p id="title1" class="title">添加新的练习网站</p>
+                            <p id="close1" class="close">×</p>
+                        </div>
+                        <form method="post" action="/blog/bk-link/add/link">
+                            <div class="modal-content" style="text-align: center">
+                                <p>如果想修改直接输入标题和修改之后的的链接地址即可</p>
+                                <p>(标题不可修改！)</p>
+                                <input type="hidden" name="BkLinkType" value="0">
+                                <div><input type="text" name="bkLinkTitle" placeholder="请输入链接标题..."></div>
+                                <div><input type="text" name="bkLinkUrl" placeholder="请输入链接地址..."></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="close btn">确定</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="mask1" class="mask"></div>
+
+
+                    <hr>
+                    <h2 style="display: inline">行万里路&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+                    <h2 th:if="${session.ok != null}" style="display: inline"><a
+                            id="open2" style="margin-left: 20px; color: #01a0e4">添加新的工具网站
+                        <i class="fa fa-plus" aria-hidden="true"></i></a>
+                    </h2>
+                    <div class="tool">
+                               <span th:each="link : ${vo.type1Links}">
+                            <a th:href="${link}" target="_blank"
+                               th:text="${link.bkLinkTitle}"></a><br></span>
+                    </div>
+
+                    <!--                    标记  -->
+                    <div id="modal2" class="modal">
+                        <div class="modal-header">
+                            <p id="title2" class="title">添加新的练习网站</p>
+                            <p id="close2" class="close">×</p>
+                        </div>
+                        <form method="post" action="/blog/bk-link/add/link">
+                            <div class="modal-content" style="text-align: center">
+                                <p>如果想修改直接输入标题和修改之后的的链接地址即可</p>
+                                <p>(标题不可修改！)</p>
+                                <input type="hidden" name="BkLinkType" value="1">
+                                <div><input type="text" name="bkLinkTitle" placeholder="请输入链接标题..."></div>
+                                <div><input type="text" name="bkLinkUrl" placeholder="请输入链接地址..."></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="close btn">确定</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="mask2" class="mask"></div>
+                </div>
+            </article>
+        </div>
+    </main>
+    <footer id="footer">
+        <div id="footer-wrap">
+            <div class="copyright">&copy;2019 - 2020 BY QQAI</div>
+        </div>
+
+        <input id="msgInput" type="hidden" th:value="${ msg != null ? msg : '---'}">
+    </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.fancybox@2.1.5/source/jquery.fancybox.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/instant.page@3.0.0/instantpage.js" type="module"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.2.0/lazysizes.min.js" async></script>
+<!-- aplayer、meting -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+<!--   一言、今日诗词   -->
+<script src="https://v1.hitokoto.cn/?encode=js&select=%23hitokoto" defer></script>
+<script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
+<!--鼠标点击效果-->
+<script src="https://cdn.jsdelivr.net/gh/TRHX/CDN-for-itrhx.com@3.0.8/js/maodian.js"></script>
+<script type="text/javascript" src="https://www.huangwx.cn/js/sweetalert-dev.js"></script>
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<!--<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+<script type="text/javascript">
+
+    // console.clear();
+    console.log("%c 有朋自远方来, 不亦说乎.", "background:#24272A; color:#ffffff", "");
+    console.log("%c Github %c", "background:#24272A; color:#ffffff", "", "https://github.com/Qqqai");
+
+    (function ($) {
+        $.fn.snow = function (options) {
+            var $flake = $('<div id="snowbox" />').css({
+                    'position': 'absolute',
+                    'z-index': '9999',
+                    'top': '-50px'
+                }).html('&#10052;'),
+                documentHeight = $(document).height(),
+                documentWidth = $(document).width(),
+                defaults = {
+                    minSize: 10,
+                    maxSize: 20,
+                    newOn: 1000,
+                    flakeColor: "#AFDAEF" /* 此处可以定义雪花颜色，若要白色可以改为#FFFFFF */
+                },
+                options = $.extend({}, defaults, options);
+            var interval = setInterval(function () {
+                var startPositionLeft = Math.random() * documentWidth - 100,
+                    startOpacity = 0.5 + Math.random(),
+                    sizeFlake = options.minSize + Math.random() * options.maxSize,
+                    endPositionTop = documentHeight - 200,
+                    endPositionLeft = startPositionLeft - 500 + Math.random() * 500,
+                    durationFall = documentHeight * 10 + Math.random() * 5000;
+                $flake.clone().appendTo('body').css({
+                    left: startPositionLeft,
+                    opacity: startOpacity,
+                    'font-size': sizeFlake,
+                    color: options.flakeColor
+                }).animate({
+                    top: endPositionTop,
+                    left: endPositionLeft,
+                    opacity: 0.2
+                }, durationFall, 'linear', function () {
+                    $(this).remove()
+                });
+            }, options.newOn);
+        };
+    })(jQuery);
+    $(function () {
+        $.fn.snow({
+            minSize: 5, /* 定义雪花最小尺寸 */
+            maxSize: 50,/* 定义雪花最大尺寸 */
+            newOn: 800  /* 定义密集程度，数字越小越密集 */
+        });
+    });
+
+    // 浏览器搞笑标题
+    var OriginTitle = document.title;
+    var titleTime;
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            // $('[rel="icon"]').attr('href', "/funny.ico");
+            document.title = '╭(°A°`)╮ 页面崩溃啦 ~';
+            clearTimeout(titleTime);
+        } else {
+            $('[rel="icon"]').attr('href', "/favicon.ico");
+            document.title = '(ฅ>ω<*ฅ) 噫又好啦 ~' + OriginTitle;
+            titleTime = setTimeout(function () {
+                document.title = OriginTitle;
+            }, 2000);
+        }
+    });
+
+    //弹窗
+    $(function () {
+        $("#open").click(function () {
+            // 获取需要使用到的元素
+            let toggleModal = document.getElementById("open");
+            // var container = document.getElementsByClassName("container")[0];
+            let mask = document.getElementById("mask4");
+            let modal = document.getElementById("modal4");
+            let closes = document.getElementById("close4");
+            toggleModal.onclick = show;
+            closes.onclick = close;
+
+            function show() {
+                mask.style.display = "block";
+                modal.style.display = "block";
+            }
+
+            function close() {
+                mask.style.display = "none";
+                modal.style.display = "none";
+            }
+
+            return false
+        })
+
+        $("#open1").click(function () {
+            // 获取需要使用到的元素
+            let toggleModal = document.getElementById("open1");
+            // var container = document.getElementsByClassName("container")[0];
+            let mask = document.getElementById("mask1");
+            let modal = document.getElementById("modal1");
+            let closes = document.getElementById("close1");
+            toggleModal.onclick = show;
+            closes.onclick = close;
+
+            function show() {
+                mask.style.display = "block";
+                modal.style.display = "block";
+            }
+
+            function close() {
+                mask.style.display = "none";
+                modal.style.display = "none";
+            }
+
+            return false
+        })
+
+        $("#open2").click(function () {
+            // 获取需要使用到的元素
+            let toggleModal = document.getElementById("open2");
+            // var container = document.getElementsByClassName("container")[0];
+            let mask = document.getElementById("mask2");
+            let modal = document.getElementById("modal2");
+            let closes = document.getElementById("close2");
+            toggleModal.onclick = show;
+            closes.onclick = close;
+
+            function show() {
+                mask.style.display = "block";
+                modal.style.display = "block";
+            }
+
+            function close() {
+                mask.style.display = "none";
+                modal.style.display = "none";
+            }
+
+            return false
+        })
+
+        $("#authA").click(function () {
+            // 获取需要使用到的元素
+            let toggleModal = document.getElementById("authA");
+            // var container = document.getElementsByClassName("container")[0];
+            let mask = document.getElementById("mask3");
+            let modal = document.getElementById("modal3");
+            let closes = document.getElementById("close3");
+            toggleModal.onclick = show;
+            closes.onclick = close;
+
+            function show() {
+                mask.style.display = "block";
+                modal.style.display = "block";
+            }
+
+            function close() {
+                mask.style.display = "none";
+                modal.style.display = "none";
+            }
+
+            return false
+        })
+
+        $("#authButton").click(function () {
+            $("#btnInput").attr("type", "submit")
+            $("#passwordInput").attr("type", "password")
+            $(this).attr("type", "hidden")
+            return false;
+        })
+    })
+
+
+    $(function () {
+        let msg = $("#msgInput").val();
+        console.log(msg)
+        if (msg !== "---") {
+            swal(msg)
+        }
+    })
+
+
+</script>
+</body>
+</html>

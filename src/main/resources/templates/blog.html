@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link href="/static/images/me.jpg" th:href="@{/images/me.jpg}" rel="icon" type="image/x-ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.css">
+    <link rel="stylesheet" href="/static/css/typo.css" th:href="@{/css/typo.css}">
+    <link rel="stylesheet" href="/static/css/animate.css" th:href="@{/css/animate.css}">
+    <link rel="stylesheet" href="/static/prism/prism.css" th:href="@{/prism/prism.css}">
+    <link rel="stylesheet" href="/static/tocbot/tocbot.css" th:href="@{/tocbot/tocbot.css}">
+    <link rel="stylesheet" href="/static/css/me.css" th:href="@{/css/me.css}">
+    <link rel="stylesheet" href="/static/css/timeline.css" th:href="@{/css/timeline.css}">
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+
+
+</head>
+<body>
+
+<!--顶部图片-->
+<div class="m-bg-type_outer" style="width: 100%;height: 50%">
+    <img src="../static/images/bg.jpg" alt="" class="ui m-bg image" style="width: 100%;height: 100%">
+    <div class="m-bg-class_cover">
+        <div class="ui container" style="position: relative ;bottom: -540px;">
+            <h2 class="m-font-size-title-large" align="center"
+                style="max-width: 1000px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap"
+                th:text="${articles.articles.articleTitle}"></h2>
+            <div class="ui container" align="center">
+                <div class="ui horizontal link list" align="center">
+                    <div class="item">
+                        <div class="ui orange basic label" style="font-size: 7px"
+                             th:text="${articles.articles.articleType == 1 ? '原创': '转载'}">原创
+                        </div>
+                    </div>
+                    <div class="item">
+                        <i class="user outline outline icon m-font-size-text-mini"></i>
+                        <a href="/" style="color: #ffffff;font-size: 18px">[[${session.me.userNickname}]]</a>
+                    </div>
+                    <div class="item">
+                        <i class="calendar icon m-font-size-text-mini"></i>
+                        <span class="m-font-size-text-mini"
+                              th:text="${#dates.format(articles.articles.articleDate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </div>
+                    <div class="item">
+                        <i class="clone icon m-font-size-text-mini"></i>
+                        <a href="#" target="_blank" style="color: #ffffff;font-size: 16px"
+                           th:text="${articles.subjectName}"></a>
+                    </div>
+                    <div class="item">
+                        <i class="eye icon m-font-size-text-mini"></i> <span class="m-font-size-text-mini"
+                                                                             th:text="${articles.articles.articleViews}"></span>
+                    </div>
+                    <div class="item">
+                        <i class="comment outline icon m-font-size-text-mini"></i>
+                        <span class="m-font-size-text-mini"
+                              th:text="${articles.articles.articleCommentCount}">2222</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--中间内容-->
+<div id="waypoint" class="m-margin- animated fadeIn">
+    <div class="ui container m-opacity box-shadow-max">
+        <!--内容-->
+        <div class="ui attached padded segment">
+            <!--中间主要内容部分-->
+            <div id="content" class="typo  typo-selection js-toc-content m-padded-lr-responsive m-padded-tb-large"
+            >
+                <div class="ui horizontal divider">end</div>
+            </div>
+
+            <div class="ui bottom attached segment">
+                <!--评论区域列表-->
+                <div id="comment-container" class="ui teal segment">
+                    <div>
+                        <div class="ui threaded comments" style="max-width: 100%;">
+                            <h3 class="ui dividing header">评论</h3>
+                            <div class="comment" th:each="vo : ${articles.infoVos}">
+                                <a class="avatar">
+                                    <img th:src="@{/images/avatar.png}">
+                                </a>
+                                <div class="content">
+                                    <a class="author">
+                                        <span th:text="${vo.userName}">Matt</span>
+                                        <!-- <div class="ui mini basic teal left pointing label m-padded-mini"
+                                              th:if="${session.me.userNickname.equals(vo.userName) ? '栈主':'路人'}"></div>-->
+                                    </a>
+                                    <div class="metadata">
+                                        <span class="date"
+                                              th:text="${#dates.format(vo.commentDate,'yyy-MM-dd HH:mm:ss')}"></span>
+                                    </div>
+                                    <div class="text" th:text="${vo.commentContent}">
+                                    </div>
+                                    <div class="actions">
+                                        <a class="delete" href="#" onclick="return confirm('确定要删除该评论吗？三思啊! 删了可就没了！')"
+                                        >删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="comment-form" class="ui form">
+                    <input type="hidden" id="articleIdInput" name="articleId" th:value="${articles.articles.articleId}">
+                    <input type="hidden" id="parentCommentIdInput" name="parentCommentId" value="0">
+                    <div class="field">
+                        <textarea name="content" id="commentTextarea" placeholder="请输入评论信息..."></textarea>
+                    </div>
+                    <div class="fields">
+                        <div class="field m-mobile-wide m-margin-bottom-small">
+                            <div class="ui left icon input">
+                                <i class="user icon"></i>
+                                <input type="text" id="nameInput" name="nickname" placeholder="姓名">
+                            </div>
+                        </div>
+                        <div class="field m-mobile-wide m-margin-bottom-small">
+                            <div class="ui left icon input">
+                                <i class="mail icon"></i>
+                                <input type="text" id="emailInput" name="email" placeholder="邮箱">
+                            </div>
+                        </div>
+                        <div class="field  m-margin-bottom-small m-mobile-wide">
+                            <button id="commentpost-btn" type="button" class="ui teal button m-mobile-wide"><i
+                                    class="edit icon"></i>发布
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="toolbar" class="m-padded m-fixed m-right-bottom" style="display: none">
+        <div class="ui vertical icon buttons ">
+            <div id="toTop-button" class="ui icon button"><i class="chevron up icon"></i></div>
+        </div>
+    </div>
+    <div class="ui toc-container flowing popup transition hidden" style="width: 250px!important;">
+        <ol class="js-toc">
+        </ol>
+    </div>
+    <div id="qrcode" class="ui wechat-qr flowing popup transition hidden " style="width: 130px !important;">
+        <!--<img src="./static/images/wechat.jpg" alt="" class="ui rounded image" style="width: 120px !important;">-->
+    </div>
+
+    <br>
+    <br>
+    <input id="middle" type="hidden" th:value="${articles.articles.articleContent}"/>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
+    <script src="../static/qrcode/qrcode.min.js" th:src="@{/qrcode/qrcode.min.js}"></script>
+    <script src="../static/prism/prism.js" th:src="@{/prism/prism.js}"></script>
+    <script src="../static/tocbot/tocbot.min.js" th:src="@{/tocbot/tocbot.min.js}"></script>
+    <script src="../static/waypoints/jquery.waypoints.min.js"
+            th:src="@{/waypoints/jquery.waypoints.min.js}"></script>
+
+    <script th:src="@{/showdown.min.js}"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+        let content = $("#middle").val(); //使用el表达式获取后台返回的markdown内容
+        // console.log(content)
+        let converter = new showdown.Converter(); //初始化转换器
+        let htmlcontent = converter.makeHtml(content); //将MarkDown转为html格式的内容
+        // console.log(htmlcontent)
+        $("#content").html(htmlcontent);//添加到div中显示出来
+
+
+        $("#commentpost-btn").click(function () {
+            let articleId = $("#articleIdInput").val();
+            let comment = $("#commentTextarea").val();
+            let userName = $("#nameInput").val();
+            let userEmail = $("#emailInput").val();
+            // console.log(articleId)
+            // console.log(comment)
+            // console.log(userName)
+            // console.log(userEmail)
+
+            let jsonString = {
+                articleId: articleId,
+                comment: comment,
+                userName: userName,
+                userEmail: userEmail
+            }
+
+            $.ajax({
+                    type: "post",
+                    url: "/blog/bk-comments/comment",
+                    data: JSON.stringify(jsonString),
+                    contentType: 'application/json; charset=UTF-8',
+                    success: function (data) {
+                        console.log(data)
+                        console.log("success")
+                        window.location.href = "/blog/bk-articles/" + [[${articles.articles.articleId}]] + "/articles"
+                    },
+                    dateType: "json"
+                }
+            )
+
+        })
+
+    </script>
+
+
+    <script>
+
+        // $('#newblog-container').load(/*[[@{/footer/newblog}]]*/"/footer/newblog");
+
+
+        // 运行时间统计
+        function secondToDate(second) {
+            if (!second) {
+                return 0;
+            }
+            var time = new Array(0, 0, 0, 0, 0);
+            if (second >= 365 * 24 * 3600) {
+                time[0] = parseInt(second / (365 * 24 * 3600));
+                second %= 365 * 24 * 3600;
+            }
+            if (second >= 24 * 3600) {
+                time[1] = parseInt(second / (24 * 3600));
+                second %= 24 * 3600;
+            }
+            if (second >= 3600) {
+                time[2] = parseInt(second / 3600);
+                second %= 3600;
+            }
+            if (second >= 60) {
+                time[3] = parseInt(second / 60);
+                second %= 60;
+            }
+            if (second > 0) {
+                time[4] = second;
+            }
+            return time;
+        }
+
+        function setTime() {
+            /*此处为网站的创建时间*/
+            var create_time = Math.round(new Date(Date.UTC(2020, 01, 25, 15, 15, 15)).getTime() / 1000);
+            var timestamp = Math.round((new Date().getTime() + 8 * 60 * 60 * 1000) / 1000);
+            currentTime = secondToDate((timestamp - create_time));
+            currentTimeHtml = currentTime[0] + '年' + currentTime[1] + '天'
+                + currentTime[2] + '时' + currentTime[3] + '分' + currentTime[4]
+                + '秒';
+            document.getElementById("htmer_time").innerHTML = currentTimeHtml;
+        }
+
+        // setInterval(setTime, 1000);
+
+        $('.menu.toggle').click(function () {
+            $('.m-item').toggleClass('m-mobile-hide');
+        });
+
+        $('#payButton').popup({
+            popup: $('.payQR.popup'),
+            on: 'click',
+            position: 'bottom center'
+        });
+
+
+        $('.toc.button').popup({
+            popup: $('.toc-container.popup'),
+            on: 'click',
+            position: 'left center'
+        });
+
+        $('.wechat').popup({
+            popup: $('.wechat-qr'),
+            position: 'left center'
+        });
+
+        $('#toTop-button').click(function () {
+            $(window).scrollTo(0, 500);
+        });
+
+
+        var waypoint = new Waypoint({
+            element: document.getElementById('waypoint'),
+            handler: function (direction) {
+                if (direction == 'down') {
+                    $('#toolbar').show(100);
+                } else {
+                    $('#toolbar').hide(500);
+                }
+                console.log('Scrolled to waypoint!  ' + direction);
+            }
+        })
+
+
+        //评论表单验证
+        $('.ui.form').form({
+            fields: {
+                title: {
+                    identifier: 'content',
+                    rules: [{
+                        type: 'empty',
+                        prompt: '请输入评论内容'
+                    }
+                    ]
+                },
+                content: {
+                    identifier: 'nickname',
+                    rules: [{
+                        type: 'empty',
+                        prompt: '请输入你的大名'
+                    }]
+                },
+                type: {
+                    identifier: 'email',
+                    rules: [{
+                        type: 'email',
+                        prompt: '请填写正确的邮箱地址'
+                    }]
+                }
+            }
+        });
+
+        // $(function () {
+
+        // });
+
+
+        $('#commentpost-btn').click(function () {
+            var boo = $('.ui.form').form('validate form');
+            if (boo) {
+                console.log('校验成功');
+                postData();
+            } else {
+                console.log('校验失败');
+            }
+        });
+
+        function clearContent() {
+            $("[name='nickname']").val('');
+            $("[name='email']").val('');
+            $("[name='content']").val('');
+            $("[name='parentComment.id']").val(-1);
+            $("[name='content']").attr("placeholder", "请输入评论信息...");
+        }
+
+
+    </script>
+</div>
+</body>
+</html>
