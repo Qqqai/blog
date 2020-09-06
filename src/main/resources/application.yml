@@ -9,16 +9,16 @@ spring:
     password: 1234
     driver-class-name: com.mysql.jdbc.Driver
   thymeleaf:
-    cache: false
+    cache: true
   jackson:
     date-format: yyyy-MM-dd HH-mm-ss
 
 user:
   auth:
     admin:
-      password: ..ai0301
+      password: #设置栈主认证的密码
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+ # configuration:
+  #  log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
