@@ -4,7 +4,7 @@ spring:
   application:
     name: blog
   datasource:
-    url: jdbc:mysql://127.0.0.1/blog?serverTimezone=UTC
+    url: jdbc:mysql://127.0.0.1/blog?serverTimezone=UTC&characterEncoding=UTF-8
     username: root
     password: 1234
     driver-class-name: com.mysql.jdbc.Driver
